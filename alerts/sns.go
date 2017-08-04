@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
-
 type SNSOutput struct {
 	client *sns.SNS
 }

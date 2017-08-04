@@ -12,7 +12,7 @@ import (
 )
 
 var UnsuccessfulExitRule = NewRule(
-	func (old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
 		pod := new.(*v1.Pod)
 
 		for _, c := range pod.Status.ContainerStatuses {

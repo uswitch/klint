@@ -19,10 +19,10 @@ import (
 type options struct {
 	kubeconfig string
 	namespace  string
-	debug bool
+	debug      bool
 	slackToken string
-	awsRegion string
-	ageLimit int
+	awsRegion  string
+	ageLimit   int
 }
 
 func createClientConfig(opts *options) (*rest.Config, error) {

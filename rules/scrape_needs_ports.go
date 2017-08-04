@@ -22,11 +22,11 @@ func validScrapeAndPorts(d *extv1b1.Deployment) bool {
 		}
 	}
 
-	return ! hasScrapeAnnotation || hasPorts
+	return !hasScrapeAnnotation || hasPorts
 }
 
 var ScrapeNeedsPortsRule = NewRule(
-	func (old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
 		deployment := new.(*extv1b1.Deployment)
 
 		if old == nil || validScrapeAndPorts(old.(*extv1b1.Deployment)) != validScrapeAndPorts(deployment) {

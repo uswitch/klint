@@ -11,9 +11,9 @@ import (
 )
 
 type Want struct {
-	Name string
-	Object runtime.Object
-	RESTClient func(*kubernetes.Clientset)rest.Interface
+	Name       string
+	Object     runtime.Object
+	RESTClient func(*kubernetes.Clientset) rest.Interface
 }
 
 var (
@@ -34,13 +34,13 @@ var (
 type RuleHandler func(runtime.Object, runtime.Object, chan *alerts.Alert)
 
 type Rule struct {
-	Wants []Want
+	Wants   []Want
 	Handler RuleHandler
 }
 
 func NewRule(handler RuleHandler, wants ...Want) *Rule {
 	return &Rule{
-		Wants: wants,
+		Wants:   wants,
 		Handler: handler,
 	}
 }

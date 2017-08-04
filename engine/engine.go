@@ -22,18 +22,18 @@ const ANNOTATION_PREFIX = "com.uswitch.alert"
 
 type Engine struct {
 	namespaceIndexer cache.Indexer
-	clientSet *kubernetes.Clientset
-	informers map[string]cache.SharedInformer
-	rules []*rules.Rule
-	outputs map[string]alerts.Output
+	clientSet        *kubernetes.Clientset
+	informers        map[string]cache.SharedInformer
+	rules            []*rules.Rule
+	outputs          map[string]alerts.Output
 }
 
 func NewEngine(clientSet *kubernetes.Clientset) *Engine {
 	return &Engine{
 		clientSet: clientSet,
 		informers: map[string]cache.SharedInformer{},
-		rules: []*rules.Rule{},
-		outputs: map[string]alerts.Output{},
+		rules:     []*rules.Rule{},
+		outputs:   map[string]alerts.Output{},
 	}
 }
 
@@ -76,7 +76,7 @@ func bind(rule *rules.Rule, informer cache.SharedInformer, ageLimit int, alerts 
 			// we should make sure the resource is actually new, not just newly seen
 			age, err := resourceAge(obj)
 
-			if err == nil && ageLimit > 0 && age > time.Minute * time.Duration(ageLimit) {
+			if err == nil && ageLimit > 0 && age > time.Minute*time.Duration(ageLimit) {
 				metaObj, _ := meta.Accessor(obj)
 
 				log.Debugf("%s.%s was too old when added", metaObj.GetNamespace(), metaObj.GetName())
@@ -130,7 +130,7 @@ func (e *Engine) Run(context context.Context, namespace string, ageLimit int) {
 	e.watchNamespaces(context)
 	alerts := e.attachRules(context, namespace, ageLimit)
 
-	for ;; {
+	for {
 		select {
 		case alert := <-alerts:
 			log.Debugf("ALERT: %s", alert.Message)
@@ -141,11 +141,11 @@ func (e *Engine) Run(context context.Context, namespace string, ageLimit int) {
 				ns, _ := accessor.Namespace(alert.Resource)
 				nsResource, _, _ := e.namespaceIndexer.GetByKey(ns)
 				nsAnnotations, _ := accessor.Annotations(nsResource.(runtime.Object))
-				extractOutputAnnotations(nsAnnotations, outputAnnotations)              // kind of nasty state mutation of outputAnnotations
+				extractOutputAnnotations(nsAnnotations, outputAnnotations) // kind of nasty state mutation of outputAnnotations
 			}
 
 			annotations, _ := accessor.Annotations(alert.Resource)
-			extractOutputAnnotations(annotations, outputAnnotations)                    // kind of nasty state mutation of outputAnnotations
+			extractOutputAnnotations(annotations, outputAnnotations) // kind of nasty state mutation of outputAnnotations
 
 			if len(outputAnnotations) == 0 {
 				resourceName, _ := accessor.Name(alert.Resource)

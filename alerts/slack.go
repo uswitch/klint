@@ -1,10 +1,9 @@
 package alerts
 
 import (
-	"github.com/nlopes/slack"
 	log "github.com/Sirupsen/logrus"
+	"github.com/nlopes/slack"
 )
-
 
 type SlackOutput struct {
 	client *slack.Client

@@ -11,5 +11,5 @@ type Output interface {
 
 type Alert struct {
 	Resource runtime.Object
-	Message string
+	Message  string
 }

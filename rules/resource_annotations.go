@@ -36,7 +36,7 @@ func containersInViolation(deployment *extv1b1.Deployment) []string {
 	containersMissingResources := []string{}
 
 	for _, container := range deployment.Spec.Template.Spec.Containers {
-		if ! (hasKeys(container.Resources.Requests, "cpu", "memory") && hasKeys(container.Resources.Limits, "cpu", "memory")) {
+		if !(hasKeys(container.Resources.Requests, "cpu", "memory") && hasKeys(container.Resources.Limits, "cpu", "memory")) {
 			containersMissingResources = append(containersMissingResources, container.Name)
 		}
 	}
@@ -45,11 +45,11 @@ func containersInViolation(deployment *extv1b1.Deployment) []string {
 }
 
 var ResourceAnnotationRule = NewRule(
-	func (old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
 		deployment := new.(*extv1b1.Deployment)
 		newInViolation := containersInViolation(deployment)
 
-		if old == nil || ! reflect.DeepEqual(containersInViolation(old.(*extv1b1.Deployment)), newInViolation) {
+		if old == nil || !reflect.DeepEqual(containersInViolation(old.(*extv1b1.Deployment)), newInViolation) {
 			if len(newInViolation) == 0 { // it wasn't zero before so they've fixed their issues
 				if old != nil {
 					out <- &alerts.Alert{
