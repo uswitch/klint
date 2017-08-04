@@ -7,7 +7,6 @@ pipeline:
     environment:
       - GOPATH=/drone
     commands:
-      - go get .
       - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/klint .
 
   publish:
