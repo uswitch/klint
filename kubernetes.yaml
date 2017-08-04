@@ -1,0 +1,33 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: klint
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: klint
+      annotations:
+        iam.amazonaws.com/role: kubernetes_klint
+    spec:
+      containers:
+        - name: klint
+          image: registry.usw.co/cloud/klint:{{ .Env.DRONE_COMMIT }}
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /etc/ssl/certs
+              name: ssl-certs-host
+              readOnly: true
+          env:
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: klint
+                  key: slack
+      volumes:
+        - hostPath:
+            path: /usr/share/ca-certificates
+          name: ssl-certs-host
