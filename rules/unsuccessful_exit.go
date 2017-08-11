@@ -19,7 +19,9 @@ var UnsuccessfulExitRule = NewRule(
 			if c.State.Terminated != nil {
 				switch exitCode := c.State.Terminated.ExitCode; exitCode {
 				case 0:    // Everything was OK
+					break
 				case 143:  // JVM SIGTERM
+					break
 				case 137:  // Process got SIGKILLd
 					out <- &alerts.Alert{
 						new,
