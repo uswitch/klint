@@ -19,7 +19,7 @@ const AnnotationName = "iam.amazonaws.com/role"
 
 func alertNoRole(deployment *extv1.Deployment, out chan *alerts.Alert) {
 	roleName := role(deployment)
-	message := fmt.Sprintf("IAM role %s specified for pods but doesn't exist", roleName)
+	message := fmt.Sprintf("IAM role `%s` specified for Pod `%s.%s` but doesn't exist", deployment.GetNamespace(), deployment.GetName(), roleName)
 	out <- &alerts.Alert{
 		deployment,
 		message,
