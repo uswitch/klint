@@ -27,7 +27,7 @@ var UnsuccessfulExitRule = NewRule(
 						new,
 						fmt.Sprintf(
 							"Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you are shuting down in time, or extend `terminationGracePeriodSeconds` on your pod.",
-							pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name, c.State.Terminated.ExitCode,
+							pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name,
 						),
 					}
 				default:
