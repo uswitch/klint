@@ -76,6 +76,7 @@ func main() {
 	engine.AddRule(rules.UnsuccessfulExitRule)
 	engine.AddRule(rules.ResourceAnnotationRule)
 	engine.AddRule(rules.ScrapeNeedsPortsRule)
+	engine.AddRule(rules.ValidIAMRoleRule)
 
 	engine.AddOutput(alerts.NewSlackOutput(opts.slackToken))
 	engine.AddOutput(alerts.NewSNSOutput(opts.awsRegion))

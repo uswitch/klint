@@ -173,6 +173,12 @@
 			"revisionTime": "2017-08-01T23:37:04Z"
 		},
 		{
+			"checksumSHA1": "H41YeQoLzuR1gQvBytlaL/gql+A=",
+			"path": "github.com/aws/aws-sdk-go/service/iam",
+			"revision": "cf66c348f82c79de333bd788d4f782c4d623ebad",
+			"revisionTime": "2017-08-10T22:08:32Z"
+		},
+		{
 			"checksumSHA1": "vP/0ADSA7kkW5CCadIpV3Q6s+DQ=",
 			"path": "github.com/aws/aws-sdk-go/service/sns",
 			"revision": "ae48d7372b4f879cfe994d7a037a6a822cafdde0",
