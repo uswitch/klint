@@ -17,13 +17,12 @@ import (
 )
 
 type options struct {
-	kubeconfig    string
-	namespace     string
-	debug         bool
-	slackToken    string
-	slackUsername string
-	awsRegion     string
-	ageLimit      int
+	kubeconfig string
+	namespace  string
+	debug      bool
+	slackToken string
+	awsRegion  string
+	ageLimit   int
 }
 
 func createClientConfig(opts *options) (*rest.Config, error) {
@@ -48,7 +47,6 @@ func main() {
 	kingpin.Flag("age-limit", "Will discard updates for resources old than n minutes. 0 disables").Default("5").IntVar(&opts.ageLimit)
 	kingpin.Flag("debug", "Debug mode").BoolVar(&opts.debug)
 	kingpin.Flag("slack-token", "").Envar("SLACK_TOKEN").Required().StringVar(&opts.slackToken)
-	kingpin.Flag("slack-username", "").Default("klint").StringVar(&opts.slackUsername)
 	kingpin.Flag("aws-region", "").Envar("AWS_REGION").Default("eu-west-1").StringVar(&opts.awsRegion)
 
 	kingpin.Parse()
@@ -79,7 +77,7 @@ func main() {
 	engine.AddRule(rules.ResourceAnnotationRule)
 	engine.AddRule(rules.ScrapeNeedsPortsRule)
 
-	engine.AddOutput(alerts.NewSlackOutput(opts.slackToken, opts.slackUsername))
+	engine.AddOutput(alerts.NewSlackOutput(opts.slackToken))
 	engine.AddOutput(alerts.NewSNSOutput(opts.awsRegion))
 
 	go engine.Run(executionContext, opts.namespace, opts.ageLimit)
