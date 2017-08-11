@@ -19,9 +19,15 @@ func (s *SlackOutput) Key() string { return "slack" }
 
 func (s *SlackOutput) Send(val string, message string) error {
 	log.Debugf("SLACK: #%s %s", val, message)
-	_, _, err := s.client.PostMessage(val, message, slack.PostMessageParameters{
-		AsUser: true,
-	})
+
+	messageParameters := slack.NewPostMessageParameters()
+	messageParameters.AsUser = true
+
+	var err error = nil
+
+	if _, _, err = s.client.PostMessage(val, message, messageParameters); err != nil {
+		log.Warnf("Failed to send message to '%s': %s", val, err)
+	}
 
 	return err
 }
