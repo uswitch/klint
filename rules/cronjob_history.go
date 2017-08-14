@@ -26,21 +26,21 @@ var RequireCronJobHistoryLimits = NewRule(
 
 		messages := make([]string, 0)
 		if job.Spec.SuccessfulJobsHistoryLimit == nil {
-			message := fmt.Sprintf("CronJob `%s/%s` doesn't specify successfulJobsHistoryLimit. Must be 10 or under.", job.GetNamespace(), job.GetName())
+			message := fmt.Sprintf("CronJob `%s/%s` doesn't specify `.spec.successfulJobsHistoryLimit`. Must be 10 or under.", job.GetNamespace(), job.GetName())
 			messages = append(messages, message)
 		} else {
 			if *job.Spec.SuccessfulJobsHistoryLimit > 10 {
-				message := fmt.Sprintf("CronJob `%s/%s` succcessfulJobsHistoryLimit is too high: `%d`. Must be 10 or under.", job.GetNamespace(), job.GetName(), *job.Spec.SuccessfulJobsHistoryLimit)
+				message := fmt.Sprintf("CronJob `%s/%s` `.spec.succcessfulJobsHistoryLimit` is too high: `%d`. Must be 10 or under.", job.GetNamespace(), job.GetName(), *job.Spec.SuccessfulJobsHistoryLimit)
 				messages = append(messages, message)
 			}
 		}
 
 		if job.Spec.FailedJobsHistoryLimit == nil {
-			message := fmt.Sprintf("CronJob `%s/%s` doesn't specify failedJobsHistoryLimit. Must be 10 or under.", job.GetNamespace(), job.GetName())
+			message := fmt.Sprintf("CronJob `%s/%s` doesn't specify `.spec.failedJobsHistoryLimit`. Must be 10 or under.", job.GetNamespace(), job.GetName())
 			messages = append(messages, message)
 		} else {
 			if *job.Spec.FailedJobsHistoryLimit > 10 {
-				message := fmt.Sprintf("CronJob `%s/%s` failedJobsHistoryLimit is too high: `%d`. Must be 10 or under.", job.GetNamespace(), job.GetName(), *job.Spec.FailedJobsHistoryLimit)
+				message := fmt.Sprintf("CronJob `%s/%s` `.spec.failedJobsHistoryLimit` is too high: `%d`. Must be 10 or under.", job.GetNamespace(), job.GetName(), *job.Spec.FailedJobsHistoryLimit)
 				messages = append(messages, message)
 			}
 		}
