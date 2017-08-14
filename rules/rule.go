@@ -1,6 +1,7 @@
 package rules
 
 import (
+	batchv2 "k8s.io/api/batch/v2alpha1"
 	"k8s.io/api/core/v1"
 	extv1b1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,6 +28,12 @@ var (
 		"deployments", &extv1b1.Deployment{},
 		func(cs *kubernetes.Clientset) rest.Interface {
 			return cs.ExtensionsV1beta1().RESTClient()
+		},
+	}
+	WantCronJobs = Want{
+		"cronjobs", &batchv2.CronJob{},
+		func(cs *kubernetes.Clientset) rest.Interface {
+			return cs.BatchV2alpha1().RESTClient()
 		},
 	}
 )
