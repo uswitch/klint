@@ -18,15 +18,15 @@ var UnsuccessfulExitRule = NewRule(
 		for _, c := range pod.Status.ContainerStatuses {
 			if c.State.Terminated != nil {
 				switch exitCode := c.State.Terminated.ExitCode; exitCode {
-				case 0:    // Everything was OK
+				case 0: // Everything was OK
 					break
-				case 143:  // JVM SIGTERM
+				case 143: // JVM SIGTERM
 					break
-				case 137:  // Process got SIGKILLd
+				case 137: // Process got SIGKILLd
 					out <- &alerts.Alert{
 						new,
 						fmt.Sprintf(
-							"Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you are shuting down in time, or extend `terminationGracePeriodSeconds` on your pod.",
+							"Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you gracefully shut down in time or extend `terminationGracePeriodSeconds` on your pod.",
 							pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name,
 						),
 					}
