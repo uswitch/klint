@@ -11,7 +11,7 @@ import (
 	extv1b1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/uswitch/klint/alerts"
+	"github.com/uswitch/klint/engine"
 )
 
 func hasKeys(m v1.ResourceList, keys ...string) bool {
@@ -44,34 +44,34 @@ func containersInViolation(deployment *extv1b1.Deployment) []string {
 	return containersMissingResources
 }
 
-var ResourceAnnotationRule = NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+var ResourceAnnotationRule = engine.NewRule(
+	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
 		deployment := new.(*extv1b1.Deployment)
 		newInViolation := containersInViolation(deployment)
 
 		if old == nil || !reflect.DeepEqual(containersInViolation(old.(*extv1b1.Deployment)), newInViolation) {
 			if len(newInViolation) == 0 { // it wasn't zero before so they've fixed their issues
 				if old != nil {
-					out <- &alerts.Alert{
+					out <- engine.NewAlert(
 						new,
 						fmt.Sprintf(
 							"Thanks for sorting your resource requests and limits on %s.%s!",
 							deployment.ObjectMeta.Namespace, podNameForDeployment(deployment),
 						),
-					}
+					)
 				}
 			} else { // it's now more or less broken than it was before, but not fixed
-				out <- &alerts.Alert{
+				out <- engine.NewAlert(
 					new,
 					fmt.Sprintf(
 						"Please add resource requests and limits to the containers (%s) part of %s.%s",
 						strings.Join(newInViolation, ", "), deployment.ObjectMeta.Namespace, podNameForDeployment(deployment),
 					),
-				}
+				)
 			}
 		} else {
 			log.Debugf("ResourceAnnotationRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 		}
 	},
-	WantDeployments,
+	engine.WantDeployments,
 )

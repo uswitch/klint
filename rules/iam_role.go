@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/uswitch/klint/alerts"
+	"github.com/uswitch/klint/engine"
 
 	extv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -17,13 +17,10 @@ import (
 
 const AnnotationName = "iam.amazonaws.com/role"
 
-func alertNoRole(deployment *extv1.Deployment, out chan *alerts.Alert) {
+func alertNoRole(deployment *extv1.Deployment, out chan *engine.Alert) {
 	roleName := role(deployment)
 	message := fmt.Sprintf("IAM role `%s` specified for pods in deployment `%s.%s` but doesn't exist", deployment.GetNamespace(), deployment.GetName(), roleName)
-	out <- &alerts.Alert{
-		deployment,
-		message,
-	}
+	out <- engine.NewAlert(deployment, message)
 }
 
 func role(deployment *extv1.Deployment) string {
@@ -38,8 +35,8 @@ func fields(deployment *extv1.Deployment) log.Fields {
 	}
 }
 
-var ValidIAMRoleRule = NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+var ValidIAMRoleRule = engine.NewRule(
+	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
 		deployment := new.(*extv1.Deployment)
 		logger := log.WithFields(fields(deployment))
 
@@ -67,5 +64,5 @@ var ValidIAMRoleRule = NewRule(
 
 		logger.Debugf("iam configured correctly, huzzah!")
 	},
-	WantDeployments,
+	engine.WantDeployments,
 )

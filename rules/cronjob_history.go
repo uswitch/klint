@@ -4,7 +4,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/uswitch/klint/alerts"
+	"github.com/uswitch/klint/engine"
 
 	batchv2 "k8s.io/api/batch/v2alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -17,8 +17,8 @@ func cronjobFields(job *batchv2.CronJob) log.Fields {
 	}
 }
 
-var RequireCronJobHistoryLimits = NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+var RequireCronJobHistoryLimits = engine.NewRule(
+	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
 		job := new.(*batchv2.CronJob)
 		logger := log.WithFields(cronjobFields(job))
 
@@ -46,8 +46,8 @@ var RequireCronJobHistoryLimits = NewRule(
 		}
 
 		for _, msg := range messages {
-			out <- &alerts.Alert{job, msg}
+			out <- engine.NewAlert(job, msg)
 		}
 	},
-	WantCronJobs,
+	engine.WantCronJobs,
 )

@@ -1,4 +1,4 @@
-package rules
+package engine
 
 import (
 	batchv2 "k8s.io/api/batch/v2alpha1"
@@ -8,8 +8,26 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/uswitch/klint/alerts"
+	"github.com/satori/go.uuid"
 )
+
+type Output interface {
+	Key() string
+	Send(string, string) error
+}
+
+type Alert struct {
+	Rule     *Rule
+	Resource runtime.Object
+	Message  string
+}
+
+func NewAlert(resource runtime.Object, message string) *Alert {
+	return &Alert{
+		Resource: resource,
+		Message: message,
+	}
+}
 
 type Want struct {
 	Name       string
@@ -38,18 +56,42 @@ var (
 	}
 )
 
-type RuleHandler func(runtime.Object, runtime.Object, chan *alerts.Alert)
+type RuleHandler func(runtime.Object, runtime.Object, chan *Alert)
 
 type Rule struct {
+	Id      string
 	Wants   []Want
 	Handler RuleHandler
 }
 
 func NewRule(handler RuleHandler, wants ...Want) *Rule {
-	return &Rule{
+	rule := &Rule{
+		Id:      uuid.NewV4().String(),
 		Wants:   wants,
-		Handler: handler,
 	}
+
+	rule.Handler = func(old runtime.Object, new runtime.Object, out chan *Alert) {
+		childOut := make(chan *Alert)
+
+		go func() {
+			for {
+				select {
+				case alert, ok := <- childOut:
+					if !ok {
+						return
+					} else {
+						alert.Rule = rule
+						out <- alert
+					}
+				}
+			}
+		}()
+
+		handler(old, new, childOut)
+		close(childOut)
+	}
+
+	return rule
 }
 
 func UniqueWants(rules []*Rule) []Want {

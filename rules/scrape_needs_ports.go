@@ -8,7 +8,7 @@ import (
 	extv1b1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/uswitch/klint/alerts"
+	"github.com/uswitch/klint/engine"
 )
 
 func validScrapeAndPorts(d *extv1b1.Deployment) bool {
@@ -25,8 +25,8 @@ func validScrapeAndPorts(d *extv1b1.Deployment) bool {
 	return !hasScrapeAnnotation || hasPorts
 }
 
-var ScrapeNeedsPortsRule = NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *alerts.Alert) {
+var ScrapeNeedsPortsRule = engine.NewRule(
+	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
 		deployment := new.(*extv1b1.Deployment)
 
 		if old == nil || validScrapeAndPorts(old.(*extv1b1.Deployment)) != validScrapeAndPorts(deployment) {
@@ -34,14 +34,20 @@ var ScrapeNeedsPortsRule = NewRule(
 
 			if validScrapeAndPorts(deployment) { // everything is good
 				if old != nil {
-					out <- &alerts.Alert{new, fmt.Sprintf("Thanks for sorting the ports for scraping on %s.%s", deployment.ObjectMeta.Namespace, podName)}
+					out <- engine.NewAlert(
+						new,
+						fmt.Sprintf("Thanks for sorting the ports for scraping on %s.%s", deployment.ObjectMeta.Namespace, podName),
+					)
 				}
 			} else { // stuff has gone bad
-				out <- &alerts.Alert{new, fmt.Sprintf("%s.%s wants to be scraped so it needs to expose some ports", deployment.ObjectMeta.Namespace, podName)}
+				out <- engine.NewAlert(
+					new,
+					fmt.Sprintf("%s.%s wants to be scraped so it needs to expose some ports", deployment.ObjectMeta.Namespace, podName),
+				)
 			}
 		} else {
 			log.Debugf("ScrapeNeedsPortsRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 		}
 	},
-	WantDeployments,
+	engine.WantDeployments,
 )

@@ -13,9 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-
-	"github.com/uswitch/klint/alerts"
-	"github.com/uswitch/klint/rules"
 )
 
 const ANNOTATION_PREFIX = "com.uswitch.alert"
@@ -24,24 +21,24 @@ type Engine struct {
 	namespaceIndexer cache.Indexer
 	clientSet        *kubernetes.Clientset
 	informers        map[string]cache.SharedInformer
-	rules            []*rules.Rule
-	outputs          map[string]alerts.Output
+	rules            []*Rule
+	outputs          map[string]Output
 }
 
 func NewEngine(clientSet *kubernetes.Clientset) *Engine {
 	return &Engine{
 		clientSet: clientSet,
 		informers: map[string]cache.SharedInformer{},
-		rules:     []*rules.Rule{},
-		outputs:   map[string]alerts.Output{},
+		rules:     []*Rule{},
+		outputs:   map[string]Output{},
 	}
 }
 
-func (e *Engine) AddRule(rule *rules.Rule) {
+func (e *Engine) AddRule(rule *Rule) {
 	e.rules = append(e.rules, rule)
 }
 
-func (e *Engine) AddOutput(output alerts.Output) {
+func (e *Engine) AddOutput(output Output) {
 	e.outputs[output.Key()] = output
 }
 
@@ -69,8 +66,7 @@ func resourceAge(resource interface{}) (time.Duration, error) {
 	return time.Now().Sub(metaObj.GetCreationTimestamp().Time), nil
 }
 
-func bind(rule *rules.Rule, informer cache.SharedInformer, ageLimit int, alerts chan *alerts.Alert) {
-	log.Debugf("age-limit: %d", ageLimit)
+func bind(rule *Rule, informer cache.SharedInformer, ageLimit int, alerts chan *Alert) {
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			// we should make sure the resource is actually new, not just newly seen
@@ -90,9 +86,9 @@ func bind(rule *rules.Rule, informer cache.SharedInformer, ageLimit int, alerts 
 	})
 }
 
-func (e *Engine) attachRules(context context.Context, namespace string, ageLimit int) <-chan *alerts.Alert {
+func (e *Engine) attachRules(context context.Context, namespace string, ageLimit int) <-chan *Alert {
 
-	for _, want := range rules.UniqueWants(e.rules) {
+	for _, want := range UniqueWants(e.rules) {
 		log.Debugf("Adding a shared informer for %s", want.Name)
 		listWatcher := cache.NewListWatchFromClient(want.RESTClient(e.clientSet), want.Name, namespace, fields.Everything())
 		informer := cache.NewSharedInformer(listWatcher, want.Object, 0)
@@ -102,7 +98,7 @@ func (e *Engine) attachRules(context context.Context, namespace string, ageLimit
 		e.informers[want.Name] = informer
 	}
 
-	alerts := make(chan *alerts.Alert)
+	alerts := make(chan *Alert)
 
 	for _, rule := range e.rules {
 		for _, want := range rule.Wants {
@@ -129,10 +125,11 @@ func (e *Engine) Run(context context.Context, namespace string, ageLimit int) {
 
 	e.watchNamespaces(context)
 	alerts := e.attachRules(context, namespace, ageLimit)
+	filteredAlerts := filterAlerts(context, alerts)
 
 	for {
 		select {
-		case alert := <-alerts:
+		case alert := <-filteredAlerts:
 			log.Debugf("ALERT: %s", alert.Message)
 
 			outputAnnotations := map[string]string{}
