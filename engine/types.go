@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"fmt"
+
 	batchv2 "k8s.io/api/batch/v2alpha1"
 	"k8s.io/api/core/v1"
 	extv1b1 "k8s.io/api/extensions/v1beta1"
@@ -25,7 +27,7 @@ type Alert struct {
 func NewAlert(resource runtime.Object, message string) *Alert {
 	return &Alert{
 		Resource: resource,
-		Message: message,
+		Message:  message,
 	}
 }
 
@@ -56,7 +58,20 @@ var (
 	}
 )
 
-type RuleHandler func(runtime.Object, runtime.Object, chan *Alert)
+type RuleHandlerContext struct {
+	alerts    chan *Alert
+	clientset *kubernetes.Clientset
+}
+
+func (ctx *RuleHandlerContext) Alert(obj runtime.Object, message string) {
+	ctx.alerts <- NewAlert(obj, message)
+}
+
+func (ctx *RuleHandlerContext) Alertf(obj runtime.Object, format string, objs ...interface{}) {
+	ctx.Alert(obj, fmt.Sprintf(format, objs...))
+}
+
+type RuleHandler func(runtime.Object, runtime.Object, *RuleHandlerContext)
 
 type Rule struct {
 	Id      string
@@ -68,27 +83,7 @@ func NewRule(handler RuleHandler, wants ...Want) *Rule {
 	rule := &Rule{
 		Id:      uuid.NewV4().String(),
 		Wants:   wants,
-	}
-
-	rule.Handler = func(old runtime.Object, new runtime.Object, out chan *Alert) {
-		childOut := make(chan *Alert)
-
-		go func() {
-			for {
-				select {
-				case alert, ok := <- childOut:
-					if !ok {
-						return
-					} else {
-						alert.Rule = rule
-						out <- alert
-					}
-				}
-			}
-		}()
-
-		handler(old, new, childOut)
-		close(childOut)
+		Handler: handler,
 	}
 
 	return rule

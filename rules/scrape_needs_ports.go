@@ -1,8 +1,6 @@
 package rules
 
 import (
-	"fmt"
-
 	log "github.com/Sirupsen/logrus"
 
 	extv1b1 "k8s.io/api/extensions/v1beta1"
@@ -26,7 +24,7 @@ func validScrapeAndPorts(d *extv1b1.Deployment) bool {
 }
 
 var ScrapeNeedsPortsRule = engine.NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
+	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		deployment := new.(*extv1b1.Deployment)
 
 		if old == nil || validScrapeAndPorts(old.(*extv1b1.Deployment)) != validScrapeAndPorts(deployment) {
@@ -34,16 +32,10 @@ var ScrapeNeedsPortsRule = engine.NewRule(
 
 			if validScrapeAndPorts(deployment) { // everything is good
 				if old != nil {
-					out <- engine.NewAlert(
-						new,
-						fmt.Sprintf("Thanks for sorting the ports for scraping on %s.%s", deployment.ObjectMeta.Namespace, podName),
-					)
+					ctx.Alertf(new, "Thanks for sorting the ports for scraping on %s.%s", deployment.ObjectMeta.Namespace, podName)
 				}
 			} else { // stuff has gone bad
-				out <- engine.NewAlert(
-					new,
-					fmt.Sprintf("%s.%s wants to be scraped so it needs to expose some ports", deployment.ObjectMeta.Namespace, podName),
-				)
+				ctx.Alertf(new, "%s.%s wants to be scraped so it needs to expose some ports", deployment.ObjectMeta.Namespace, podName)
 			}
 		} else {
 			log.Debugf("ScrapeNeedsPortsRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))

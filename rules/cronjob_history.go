@@ -18,7 +18,7 @@ func cronjobFields(job *batchv2.CronJob) log.Fields {
 }
 
 var RequireCronJobHistoryLimits = engine.NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
+	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		job := new.(*batchv2.CronJob)
 		logger := log.WithFields(cronjobFields(job))
 
@@ -46,7 +46,7 @@ var RequireCronJobHistoryLimits = engine.NewRule(
 		}
 
 		for _, msg := range messages {
-			out <- engine.NewAlert(job, msg)
+			ctx.Alert(job, msg)
 		}
 	},
 	engine.WantCronJobs,
