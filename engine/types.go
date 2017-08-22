@@ -71,6 +71,10 @@ func (ctx *RuleHandlerContext) Alertf(obj runtime.Object, format string, objs ..
 	ctx.Alert(obj, fmt.Sprintf(format, objs...))
 }
 
+func (ctx *RuleHandlerContext) Client() *kubernetes.Clientset {
+	return ctx.clientset
+}
+
 type RuleHandler func(runtime.Object, runtime.Object, *RuleHandlerContext)
 
 type Rule struct {
