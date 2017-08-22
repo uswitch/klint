@@ -1,7 +1,7 @@
 package rules
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"k8s.io/api/core/v1"
@@ -11,8 +11,8 @@ import (
 )
 
 var UnsuccessfulExitRule = engine.NewRule(
-	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
-		pod := new.(*v1.Pod)
+	func(old runtime.Object, newObj runtime.Object, ctx *engine.RuleHandlerContext) {
+		pod := newObj.(*v1.Pod)
 
 		for _, c := range pod.Status.ContainerStatuses {
 			if c.State.Terminated != nil {
@@ -22,7 +22,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 				case 143: // JVM SIGTERM
 					break
 				case 137: // Process got SIGKILLd
-					ctx.Alertf(new, "Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you gracefully shut down in time or extend `terminationGracePeriodSeconds` on your pod.", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name)
+					ctx.Alertf(newObj, "Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you gracefully shut down in time or extend `terminationGracePeriodSeconds` on your pod.", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name)
 				default:
 					since := int64(30)
 					opts := &v1.PodLogOptions{
@@ -35,17 +35,16 @@ var UnsuccessfulExitRule = engine.NewRule(
 					rs, err := ctx.Client().Core().Pods(pod.Namespace).GetLogs(pod.Name, opts).Stream()
 					if err != nil {
 						log.Errorf("error retrieving pod logs: %s", err.Error())
-						ctx.Alert(new, message)
+						ctx.Alert(newObj, message)
 						return
 					}
 
 					defer rs.Close()
-					scanner := bufio.NewScanner(rs)
-					for scanner.Scan() {
-						log.Debugf("log: %s", scanner.Text())
-					}
+					buf := new(bytes.Buffer)
+					buf.ReadFrom(rs)
 
-					ctx.Alert(new, message)
+					log.Debugf("log: \"%s\"", buf.String())
+					ctx.Alertf(newObj, "%s\n```%s```", message, buf.String())
 				}
 			}
 		}

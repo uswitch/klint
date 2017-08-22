@@ -61,10 +61,13 @@ var (
 type RuleHandlerContext struct {
 	alerts    chan *Alert
 	clientset *kubernetes.Clientset
+	rule      *Rule
 }
 
 func (ctx *RuleHandlerContext) Alert(obj runtime.Object, message string) {
-	ctx.alerts <- NewAlert(obj, message)
+	alert := NewAlert(obj, message)
+	alert.Rule = ctx.rule
+	ctx.alerts <- alert
 }
 
 func (ctx *RuleHandlerContext) Alertf(obj runtime.Object, format string, objs ...interface{}) {

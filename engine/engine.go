@@ -98,12 +98,13 @@ func (e *Engine) attachRules(context context.Context, namespace string, ageLimit
 	}
 
 	alerts := make(chan *Alert)
-	ctx := &RuleHandlerContext{
-		alerts:    alerts,
-		clientset: e.clientSet,
-	}
-
 	for _, rule := range e.rules {
+		ctx := &RuleHandlerContext{
+			alerts:    alerts,
+			clientset: e.clientSet,
+			rule:      rule,
+		}
+
 		for _, want := range rule.Wants {
 			bind(rule, e.informers[want.Name], ageLimit, ctx)
 		}
