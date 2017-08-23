@@ -66,7 +66,7 @@ func resourceAge(resource interface{}) (time.Duration, error) {
 	return time.Now().Sub(metaObj.GetCreationTimestamp().Time), nil
 }
 
-func bind(rule *Rule, informer cache.SharedInformer, ageLimit int, alerts chan *Alert) {
+func bind(rule *Rule, informer cache.SharedInformer, ageLimit int, ctx *RuleHandlerContext) {
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			// we should make sure the resource is actually new, not just newly seen
@@ -77,17 +77,16 @@ func bind(rule *Rule, informer cache.SharedInformer, ageLimit int, alerts chan *
 
 				log.Debugf("%s.%s was too old when added", metaObj.GetNamespace(), metaObj.GetName())
 			} else {
-				rule.Handler(nil, obj.(runtime.Object), alerts)
+				rule.Handler(nil, obj.(runtime.Object), ctx)
 			}
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
-			rule.Handler(old.(runtime.Object), new.(runtime.Object), alerts)
+			rule.Handler(old.(runtime.Object), new.(runtime.Object), ctx)
 		},
 	})
 }
 
 func (e *Engine) attachRules(context context.Context, namespace string, ageLimit int) <-chan *Alert {
-
 	for _, want := range UniqueWants(e.rules) {
 		log.Debugf("Adding a shared informer for %s", want.Name)
 		listWatcher := cache.NewListWatchFromClient(want.RESTClient(e.clientSet), want.Name, namespace, fields.Everything())
@@ -99,10 +98,15 @@ func (e *Engine) attachRules(context context.Context, namespace string, ageLimit
 	}
 
 	alerts := make(chan *Alert)
-
 	for _, rule := range e.rules {
+		ctx := &RuleHandlerContext{
+			alerts:    alerts,
+			clientset: e.clientSet,
+			rule:      rule,
+		}
+
 		for _, want := range rule.Wants {
-			bind(rule, e.informers[want.Name], ageLimit, alerts)
+			bind(rule, e.informers[want.Name], ageLimit, ctx)
 		}
 	}
 

@@ -1,8 +1,6 @@
 package rules
 
 import (
-	"fmt"
-
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,12 +15,6 @@ import (
 
 const AnnotationName = "iam.amazonaws.com/role"
 
-func alertNoRole(deployment *extv1.Deployment, out chan *engine.Alert) {
-	roleName := role(deployment)
-	message := fmt.Sprintf("IAM role `%s` specified for pods in deployment `%s.%s` but doesn't exist", deployment.GetNamespace(), deployment.GetName(), roleName)
-	out <- engine.NewAlert(deployment, message)
-}
-
 func role(deployment *extv1.Deployment) string {
 	return deployment.Spec.Template.GetAnnotations()[AnnotationName]
 }
@@ -36,7 +28,7 @@ func fields(deployment *extv1.Deployment) log.Fields {
 }
 
 var ValidIAMRoleRule = engine.NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
+	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		deployment := new.(*extv1.Deployment)
 		logger := log.WithFields(fields(deployment))
 
@@ -54,7 +46,7 @@ var ValidIAMRoleRule = engine.NewRule(
 		if err != nil {
 			e, _ := err.(awserr.Error)
 			if e.Code() == iam.ErrCodeNoSuchEntityException {
-				alertNoRole(deployment, out)
+				ctx.Alertf(new, "IAM role `%s` specified for pods in deployment `%s.%s` but doesn't exist", deployment.GetNamespace(), deployment.GetName(), roleName)
 				return
 			}
 

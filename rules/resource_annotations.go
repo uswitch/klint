@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -45,29 +44,17 @@ func containersInViolation(deployment *extv1b1.Deployment) []string {
 }
 
 var ResourceAnnotationRule = engine.NewRule(
-	func(old runtime.Object, new runtime.Object, out chan *engine.Alert) {
+	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		deployment := new.(*extv1b1.Deployment)
 		newInViolation := containersInViolation(deployment)
 
 		if old == nil || !reflect.DeepEqual(containersInViolation(old.(*extv1b1.Deployment)), newInViolation) {
 			if len(newInViolation) == 0 { // it wasn't zero before so they've fixed their issues
 				if old != nil {
-					out <- engine.NewAlert(
-						new,
-						fmt.Sprintf(
-							"Thanks for sorting your resource requests and limits on %s.%s!",
-							deployment.ObjectMeta.Namespace, podNameForDeployment(deployment),
-						),
-					)
+					ctx.Alertf(new, "Thanks for sorting your resource requests and limits on %s.%s!", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 				}
 			} else { // it's now more or less broken than it was before, but not fixed
-				out <- engine.NewAlert(
-					new,
-					fmt.Sprintf(
-						"Please add resource requests and limits to the containers (%s) part of %s.%s",
-						strings.Join(newInViolation, ", "), deployment.ObjectMeta.Namespace, podNameForDeployment(deployment),
-					),
-				)
+				ctx.Alertf(new, "Please add resource requests and limits to the containers (%s) part of %s.%s", strings.Join(newInViolation, ", "), deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 			}
 		} else {
 			log.Debugf("ResourceAnnotationRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
