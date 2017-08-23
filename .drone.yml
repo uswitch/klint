@@ -18,7 +18,7 @@ pipeline:
     tags: [ "${DRONE_COMMIT_SHA}", "latest" ]
 
   deploy:
-    secrets: [KUBE_TOKEN, KUBE_CA, KUBE_SERVER]
+    secrets: ["KUBE_TOKEN", "KUBE_CA", "KUBE_SERVER"]
     when:
       event: deployment
     image: registry.usw.co/drone/deployment:latest
