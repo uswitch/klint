@@ -15,6 +15,15 @@ caused by their roles being spelled incorrectly. Although relatively easy to deb
 it is not a great experience for the application developer. Klint helps us encode such checks and proactively alert
 teams when they need to take action.
 
+## Using
+
+1. Run klint as a deployment with a single replica on your cluster. 
+2. Add an annotation to the namespace, or an object to be monitored: `com.uswitch.alert/slack: <channel>`
+
+As objects change klint will compare them against the rules and post to Slack.
+
+![Alert](alert.png)
+
 ## Rules
 
 ### UnsuccessfulExitRule
