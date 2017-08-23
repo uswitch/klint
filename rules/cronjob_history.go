@@ -10,17 +10,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func cronjobFields(job *batchv2.CronJob) log.Fields {
-	return log.Fields{
-		"namespace": job.GetNamespace(),
-		"name":      job.GetName(),
-	}
-}
-
 var RequireCronJobHistoryLimits = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		job := new.(*batchv2.CronJob)
-		logger := log.WithFields(cronjobFields(job))
+		logger := log.WithFields(log.Fields{"rule": "RequireCronJobHistoryLimits", "namespace": job.GetNamespace(), "name": job.GetName()})
 
 		logger.Debugf("checking for history limit requirement")
 

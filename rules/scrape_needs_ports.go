@@ -26,6 +26,7 @@ func validScrapeAndPorts(d *extv1b1.Deployment) bool {
 var ScrapeNeedsPortsRule = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		deployment := new.(*extv1b1.Deployment)
+		logger := log.WithFields(log.Fields{"name": deployment.Name, "namespace": deployment.Namespace, "rule": "ScrapeNeedsPortsRule"})
 
 		if old == nil || validScrapeAndPorts(old.(*extv1b1.Deployment)) != validScrapeAndPorts(deployment) {
 			podName := podNameForDeployment(deployment)
@@ -38,7 +39,7 @@ var ScrapeNeedsPortsRule = engine.NewRule(
 				ctx.Alertf(new, "%s.%s wants to be scraped so it needs to expose some ports", deployment.ObjectMeta.Namespace, podName)
 			}
 		} else {
-			log.Debugf("ScrapeNeedsPortsRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
+			logger.Debugf("ScrapeNeedsPortsRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 		}
 	},
 	engine.WantDeployments,

@@ -15,26 +15,13 @@ import (
 
 const AnnotationName = "iam.amazonaws.com/role"
 
-func role(deployment *extv1.Deployment) string {
-	return deployment.Spec.Template.GetAnnotations()[AnnotationName]
-}
-
-func fields(deployment *extv1.Deployment) log.Fields {
-	return log.Fields{
-		"namespace": deployment.GetNamespace(),
-		"name":      deployment.GetName(),
-		"role":      role(deployment),
-	}
-}
-
 var ValidIAMRoleRule = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		deployment := new.(*extv1.Deployment)
-		logger := log.WithFields(fields(deployment))
+		roleName := deployment.Spec.Template.GetAnnotations()[AnnotationName]
+		logger := log.WithFields(log.Fields{"rule": "ValidIAMRoleRule", "namespace": deployment.GetNamespace(), "name": deployment.GetName(), "role": roleName})
 
 		logger.Debugf("checking deployment for iam infringement")
-
-		roleName := role(deployment)
 		if roleName == "" {
 			return
 		}

@@ -46,6 +46,8 @@ func containersInViolation(deployment *extv1b1.Deployment) []string {
 var ResourceAnnotationRule = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
 		deployment := new.(*extv1b1.Deployment)
+		logger := log.WithFields(log.Fields{"rule": "ResourceAnnotationRule", "name": deployment.Name, "namespace": deployment.Namespace})
+
 		newInViolation := containersInViolation(deployment)
 
 		if old == nil || !reflect.DeepEqual(containersInViolation(old.(*extv1b1.Deployment)), newInViolation) {
@@ -57,7 +59,7 @@ var ResourceAnnotationRule = engine.NewRule(
 				ctx.Alertf(new, "Please add resource requests and limits to the containers (%s) part of %s.%s", strings.Join(newInViolation, ", "), deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 			}
 		} else {
-			log.Debugf("ResourceAnnotationRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
+			logger.Debugf("ResourceAnnotationRule: %s.%s hadn't changed", deployment.ObjectMeta.Namespace, podNameForDeployment(deployment))
 		}
 	},
 	engine.WantDeployments,
