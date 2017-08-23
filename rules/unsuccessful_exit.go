@@ -14,6 +14,8 @@ var UnsuccessfulExitRule = engine.NewRule(
 	func(old runtime.Object, newObj runtime.Object, ctx *engine.RuleHandlerContext) {
 		pod := newObj.(*v1.Pod)
 
+		logger := log.WithFields(log.Fields{"name": pod.Name, "namespace": pod.Namespace, "rule": "UnsuccessfulExitRule"})
+
 		for _, c := range pod.Status.ContainerStatuses {
 			if c.State.Terminated != nil {
 				switch exitCode := c.State.Terminated.ExitCode; exitCode {
@@ -34,16 +36,20 @@ var UnsuccessfulExitRule = engine.NewRule(
 
 					rs, err := ctx.Client().Core().Pods(pod.Namespace).GetLogs(pod.Name, opts).Stream()
 					if err != nil {
-						log.Errorf("error retrieving pod logs: %s", err.Error())
+						logger.Errorf("error retrieving pod logs: %s", err.Error())
 						ctx.Alert(newObj, message)
 						return
 					}
 
 					defer rs.Close()
 					buf := new(bytes.Buffer)
-					buf.ReadFrom(rs)
+					_, err = buf.ReadFrom(rs)
+					if err != nil {
+						logger.Errorf("error reading log stream: %s", err.Error())
+						return
+					}
 
-					log.Debugf("log: \"%s\"", buf.String())
+					logger.Debugf("log: \"%s\"", buf.String())
 					ctx.Alertf(newObj, "%s\n```%s```", message, buf.String())
 				}
 			}
