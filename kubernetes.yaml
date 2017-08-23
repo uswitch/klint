@@ -17,6 +17,8 @@ spec:
         - name: klint
           image: registry.usw.co/cloud/klint:{{ .Env.DRONE_COMMIT }}
           imagePullPolicy: Always
+          args:
+            - --json
           volumeMounts:
             - mountPath: /etc/ssl/certs
               name: ssl-certs-host

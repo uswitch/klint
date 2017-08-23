@@ -23,6 +23,7 @@ type options struct {
 	slackToken string
 	awsRegion  string
 	ageLimit   int
+	jsonFormat bool
 }
 
 func createClientConfig(opts *options) (*rest.Config, error) {
@@ -48,6 +49,7 @@ func main() {
 	kingpin.Flag("debug", "Debug mode").BoolVar(&opts.debug)
 	kingpin.Flag("slack-token", "").Envar("SLACK_TOKEN").Required().StringVar(&opts.slackToken)
 	kingpin.Flag("aws-region", "").Envar("AWS_REGION").Default("eu-west-1").StringVar(&opts.awsRegion)
+	kingpin.Flag("json", "Output log data in JSON format").Default("false").BoolVar(&opts.jsonFormat)
 
 	kingpin.Parse()
 
@@ -56,6 +58,10 @@ func main() {
 		log.Debugln("Debug logging enabled")
 	} else {
 		log.SetLevel(log.InfoLevel)
+	}
+
+	if opts.jsonFormat {
+		log.SetFormatter(&log.JSONFormatter{})
 	}
 
 	config, err := createClientConfig(opts)
