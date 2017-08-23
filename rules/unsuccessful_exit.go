@@ -52,7 +52,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 					}
 
 					logger.Debugf("log: \"%s\"", buf.String())
-					ctx.Alertf(newObj, "%s\n```%s```", message, buf.String())
+					ctx.Alertf(newObj, "%s\n\n```%s```", message, buf.String())
 				}
 			}
 		}
