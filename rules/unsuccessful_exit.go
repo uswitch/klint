@@ -31,6 +31,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 						Container:    c.Name,
 						Follow:       false,
 						SinceSeconds: &since,
+						Previous:     true,
 					}
 					message := fmt.Sprintf("Pod `%s.%s` (container: `%s`) has failed with exit code: `%d`", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name, c.State.Terminated.ExitCode)
 
