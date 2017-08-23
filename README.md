@@ -7,7 +7,7 @@ via Slack webhooks to a configurable channel (using an annotation on the object 
 We started Klint to help us move more production teams over to our Kubernetes infrastructure. It helps us achieve:
 
 1. Identify and debug erroneous objects
-2. Nudge objects in line with our policy as both change.
+2. Nudge objects in line with our policy as both change over time
 
 For example, we run another tool called [kiam](https://github.com/uswitch/kiam) to integrate with AWS' IAM roles,
 allocating each pod its own session-based credentials. On more than one occasion an application team had problems
