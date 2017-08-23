@@ -22,6 +22,7 @@ pipeline:
     when:
       event: deployment
     image: registry.usw.co/drone/deployment:latest
+    secrets: [ KUBE_CA, KUBE_TOKEN, KUBE_SERVER ]
     kubernetes:
       template: kubernetes.yaml
       namespace: kube-system
