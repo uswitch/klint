@@ -46,6 +46,8 @@ var UnsuccessfulExitRule = engine.NewRule(
 					_, err = buf.ReadFrom(rs)
 					if err != nil {
 						logger.Errorf("error reading log stream: %s", err.Error())
+						// we weren't able to extract logs but we should still report errors
+						ctx.Alert(newObj, message)
 						return
 					}
 
