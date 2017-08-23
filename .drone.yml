@@ -1,5 +1,8 @@
+workspace:
+  base: /go
+  path: src/github.com/uswitch/klint
+  
 pipeline:
-
   build:
     when:
       event: push
