@@ -27,11 +27,13 @@ var UnsuccessfulExitRule = engine.NewRule(
 					ctx.Alertf(newObj, "Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you gracefully shut down in time or extend `terminationGracePeriodSeconds` on your pod.", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name)
 				default:
 					since := int64(30)
+					tailLines := int64(5)
 					opts := &v1.PodLogOptions{
 						Container:    c.Name,
 						Follow:       false,
 						SinceSeconds: &since,
 						Previous:     true,
+						TailLines:    &tailLines,
 					}
 					message := fmt.Sprintf("Pod `%s.%s` (container: `%s`) has failed with exit code: `%d`", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name, c.State.Terminated.ExitCode)
 
