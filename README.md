@@ -9,7 +9,7 @@ We started Klint to help us move more production teams over to our Kubernetes in
 1. Identify and debug erroneous objects
 2. Nudge objects in line with our policy as both change.
 
-For example, we run another tool called (https://github.com/uswitch/kiam)[kiam] to integrate with AWS' IAM roles,
+For example, we run another tool called [kiam](https://github.com/uswitch/kiam) to integrate with AWS' IAM roles,
 allocating each pod its own session-based credentials. On more than one occasion an application team had problems
 caused by their roles being spelled incorrectly. Although relatively easy to debug for the Cluster Operations team
 it is not a great experience for the application developer. Klint helps us encode such checks and proactively alert
