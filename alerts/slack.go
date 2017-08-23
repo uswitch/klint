@@ -28,7 +28,7 @@ func (s *SlackOutput) Send(val string, message string) error {
 	log.Debugf("sending alert \"%s\" to '%s'", message, val)
 
 	if _, _, err = s.client.PostMessage(val, message, messageParameters); err != nil {
-		log.Warnf("Failed to send message \"%s\" to '%s': %s", message, val, err)
+		log.Errorf("Failed to send message \"%s\" to '%s': %s", message, val, err)
 	}
 
 	return err
