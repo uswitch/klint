@@ -4,24 +4,6 @@ workspace:
   
 pipeline:
   build:
-    when:
-      event: push
-    image: golang:1.8
+    image: debian:jessie
     commands:
-      - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/klint .
-
-  publish:
-    when:
-      event: push
-    image: plugins/docker
-    repo: registry.usw.co/cloud/klint
-    tags: [ "${DRONE_COMMIT_SHA}", "latest" ]
-
-  deploy:
-    secrets: [ KUBE_CA, KUBE_TOKEN, KUBE_SERVER ]
-    when:
-      event: deployment
-    image: registry.usw.co/drone/deployment:latest
-    kubernetes:
-      template: kubernetes.yaml
-      namespace: kube-system
+      - ls /local/docker
