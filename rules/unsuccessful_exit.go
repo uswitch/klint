@@ -27,7 +27,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 				case 137: // Process got SIGKILLd
 					ctx.Alertf(newObj, "Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you gracefully shut down in time or extend `terminationGracePeriodSeconds` on your pod.", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name)
 				default:
-					tailLines := int64(5)
+					tailLines := int64(20)
 					opts := &v1.PodLogOptions{
 						Container: c.Name,
 						Follow:    false,
