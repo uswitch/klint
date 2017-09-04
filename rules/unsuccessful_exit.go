@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"bytes"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"k8s.io/api/core/v1"
@@ -17,6 +16,8 @@ var UnsuccessfulExitRule = engine.NewRule(
 		logger := log.WithFields(log.Fields{"name": pod.Name, "namespace": pod.Namespace, "rule": "UnsuccessfulExitRule"})
 
 		for _, c := range pod.Status.ContainerStatuses {
+			logger = logger.WithFields(log.Fields{"container.name": c.Name, "container.id": c.ContainerID})
+
 			if c.State.Terminated != nil {
 				switch exitCode := c.State.Terminated.ExitCode; exitCode {
 				case 0: // Everything was OK
@@ -26,36 +27,31 @@ var UnsuccessfulExitRule = engine.NewRule(
 				case 137: // Process got SIGKILLd
 					ctx.Alertf(newObj, "Pod `%s.%s` (container: `%s`) was killed by a SIGKILL. Please make sure you gracefully shut down in time or extend `terminationGracePeriodSeconds` on your pod.", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name)
 				default:
-					since := int64(30)
 					tailLines := int64(5)
 					opts := &v1.PodLogOptions{
-						Container:    c.Name,
-						Follow:       false,
-						SinceSeconds: &since,
-						Previous:     true,
-						TailLines:    &tailLines,
+						Container: c.Name,
+						Follow:    false,
+						Previous:  false,
+						TailLines: &tailLines,
 					}
 					message := fmt.Sprintf("Pod `%s.%s` (container: `%s`) has failed with exit code: `%d`", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name, c.State.Terminated.ExitCode)
 
-					rs, err := ctx.Client().Core().Pods(pod.Namespace).GetLogs(pod.Name, opts).Stream()
+					result := ctx.Client().Core().Pods(pod.Namespace).GetLogs(pod.Name, opts).Do()
+					if result.Error() != nil {
+						logger.Errorf("error retrieving pod logs: %s", result.Error())
+						ctx.Alert(newObj, message)
+						return
+					}
+
+					bytes, err := result.Raw()
 					if err != nil {
 						logger.Errorf("error retrieving pod logs: %s", err.Error())
 						ctx.Alert(newObj, message)
 						return
 					}
 
-					defer rs.Close()
-					buf := new(bytes.Buffer)
-					_, err = buf.ReadFrom(rs)
-					if err != nil {
-						logger.Errorf("error reading log stream: %s", err.Error())
-						// we weren't able to extract logs but we should still report errors
-						ctx.Alert(newObj, message)
-						return
-					}
-
-					logger.Debugf("log: \"%s\"", buf.String())
-					ctx.Alertf(newObj, "%s\n\n```%s```", message, buf.String())
+					logger.Debugf("log: \"%s\"", string(bytes))
+					ctx.Alertf(newObj, "%s\n\n```%s```", message, string(bytes))
 				}
 			}
 		}
