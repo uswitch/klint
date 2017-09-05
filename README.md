@@ -15,6 +15,13 @@ caused by their roles being spelled incorrectly. Although relatively easy to deb
 it is not a great experience for the application developer. Klint helps us encode such checks and proactively alert
 teams when they need to take action.
 
+## Building
+To build the exectuable you can use the `go` tool directly:
+
+```
+$ go get github.com/uswitch/klint
+```
+
 ## Using
 
 1. Run klint as a deployment with a single replica on your cluster. 
