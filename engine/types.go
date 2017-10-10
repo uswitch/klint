@@ -56,6 +56,12 @@ var (
 			return cs.BatchV2alpha1().RESTClient()
 		},
 	}
+	WantIngress = Want{
+		"ingresses", &extv1b1.Ingress{},
+		func(cs *kubernetes.Clientset) rest.Interface {
+			return cs.ExtensionsV1beta1().RESTClient()
+		},
+	}
 )
 
 type RuleHandlerContext struct {
