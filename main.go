@@ -84,6 +84,7 @@ func main() {
 	engine.AddRule(rules.ScrapeNeedsPortsRule)
 	engine.AddRule(rules.ValidIAMRoleRule)
 	engine.AddRule(rules.RequireCronJobHistoryLimits)
+	engine.AddRule(rules.IngressNeedsAnnotation)
 
 	engine.AddOutput(alerts.NewSlackOutput(opts.slackToken))
 	engine.AddOutput(alerts.NewSNSOutput(opts.awsRegion))
