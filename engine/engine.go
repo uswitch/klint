@@ -81,6 +81,8 @@ func bind(rule *Rule, informer cache.SharedInformer, ageLimit int, ctx *RuleHand
 			}
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
+			metaObj, _ := meta.Accessor(new)
+			log.Debugf("Running handler. Namespace: %s, Name: %s", metaObj.GetNamespace(), metaObj.GetName())
 			rule.Handler(old.(runtime.Object), new.(runtime.Object), ctx)
 		},
 	})
