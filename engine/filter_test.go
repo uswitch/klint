@@ -11,7 +11,7 @@ import (
 )
 
 var testRule = NewRule(
-	func(_ runtime.Object, _ runtime.Object, _ chan *Alert) { },
+	func(_ runtime.Object, _ runtime.Object, _ *RuleHandlerContext) {},
 )
 
 func createResource(id string) runtime.Object {
@@ -25,9 +25,9 @@ func createResource(id string) runtime.Object {
 func TestThing(t *testing.T) {
 	in := make(chan *Alert, 3)
 
-	in<-&Alert{testRule, createResource("123"), "Foobles"}
-	in<-&Alert{testRule, createResource("123"), "Foobles"}
-	in<-&Alert{testRule, createResource("123"), "Barbles"}
+	in <- &Alert{testRule, createResource("123"), "Foobles"}
+	in <- &Alert{testRule, createResource("123"), "Foobles"}
+	in <- &Alert{testRule, createResource("123"), "Barbles"}
 
 	filterContext, cancelFilter := context.WithCancel(context.Background())
 	outCh := filterAlerts(filterContext, in)
@@ -45,4 +45,6 @@ func TestThing(t *testing.T) {
 	if outArr[1].Message == "Foobles" {
 		t.Fatal("Didn't filter out 2nd message")
 	}
+
+	cancelFilter()
 }
