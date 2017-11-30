@@ -2,17 +2,18 @@ package rules
 
 import (
 	"fmt"
+
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/uswitch/klint/engine"
 
-	batchv2 "k8s.io/api/batch/v2alpha1"
+	batchv1 "k8s.io/api/batch/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
 var RequireCronJobHistoryLimits = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
-		job := new.(*batchv2.CronJob)
+		job := new.(*batchv1.CronJob)
 		logger := log.WithFields(log.Fields{"rule": "RequireCronJobHistoryLimits", "namespace": job.GetNamespace(), "name": job.GetName()})
 
 		logger.Debugf("checking for history limit requirement")

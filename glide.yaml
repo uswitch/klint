@@ -1,0 +1,36 @@
+package: github.com/uswitch/klint
+import:
+- package: github.com/Sirupsen/logrus
+  version: ~1.0.3
+- package: github.com/aws/aws-sdk-go
+  version: ~1.12.35
+  subpackages:
+  - aws
+  - aws/awserr
+  - aws/session
+  - service/iam
+  - service/sns
+- package: github.com/nlopes/slack
+  version: ~0.1.0
+- package: github.com/satori/go.uuid
+  version: ~1.1.0
+- package: gopkg.in/alecthomas/kingpin.v2
+  version: ~2.2.5
+- package: k8s.io/api
+  subpackages:
+  - batch/v1beta1
+  - batch/v2alpha1
+  - core/v1
+  - extensions/v1beta1
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/api/meta
+  - pkg/fields
+  - pkg/runtime
+- package: k8s.io/client-go
+  version: ~5.0.1
+  subpackages:
+  - kubernetes
+  - rest
+  - tools/cache
+  - tools/clientcmd
