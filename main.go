@@ -47,7 +47,7 @@ func main() {
 	kingpin.Flag("namespace", "Namespace to monitor").Default("").StringVar(&opts.namespace)
 	kingpin.Flag("age-limit", "Will discard updates for resources old than n minutes. 0 disables").Default("5").IntVar(&opts.ageLimit)
 	kingpin.Flag("debug", "Debug mode").BoolVar(&opts.debug)
-	kingpin.Flag("slack-token", "").Envar("SLACK_TOKEN").Required().StringVar(&opts.slackToken)
+	kingpin.Flag("slack-token", "").Envar("SLACK_TOKEN").StringVar(&opts.slackToken)
 	kingpin.Flag("aws-region", "").Envar("AWS_REGION").Default("eu-west-1").StringVar(&opts.awsRegion)
 	kingpin.Flag("json", "Output log data in JSON format").Default("false").BoolVar(&opts.jsonFormat)
 
@@ -86,10 +86,11 @@ func main() {
 	engine.AddRule(rules.RequireCronJobHistoryLimits)
 	engine.AddRule(rules.IngressNeedsAnnotation)
 
-	engine.AddOutput(alerts.NewSlackOutput(opts.slackToken))
+	if len(opts.slackToken) > 0 {
+		engine.AddOutput(alerts.NewSlackOutput(opts.slackToken))
+	}
 	engine.AddOutput(alerts.NewSNSOutput(opts.awsRegion))
 
 	go engine.Run(executionContext, opts.namespace, opts.ageLimit)
-
 	select {}
 }
