@@ -35,7 +35,7 @@ func containersInViolation(deployment *extv1b1.Deployment) []string {
 	containersMissingResources := []string{}
 
 	for _, container := range deployment.Spec.Template.Spec.Containers {
-		if !(hasKeys(container.Resources.Requests, "cpu", "memory") && hasKeys(container.Resources.Limits, "cpu", "memory")) {
+		if !(hasKeys(container.Resources.Requests, "cpu", "memory") && hasKeys(container.Resources.Limits, "memory")) {
 			containersMissingResources = append(containersMissingResources, container.Name)
 		}
 	}
