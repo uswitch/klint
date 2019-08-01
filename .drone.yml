@@ -1,12 +1,12 @@
 workspace:
   base: /go
   path: src/github.com/uswitch/klint
-  
+
 pipeline:
   build:
     when:
       event: push
-    image: golang:1.8
+    image: golang:1.12
     commands:
       - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/klint .
 
