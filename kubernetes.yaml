@@ -1,35 +1,58 @@
----
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  creationTimestamp: null
+  labels:
+    app: klint
   name: klint
   namespace: kube-system
 spec:
+  progressDeadlineSeconds: 2147483647
   replicas: 1
+  revisionHistoryLimit: 2147483647
+  selector:
+    matchLabels:
+      app: klint
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
-      labels:
-        app: klint
       annotations:
         iam.amazonaws.com/role: kubernetes_klint
+      creationTimestamp: null
+      labels:
+        app: klint
     spec:
       containers:
-        - name: klint
-          image: registry.usw.co/cloud/klint:{{ .Env.DRONE_COMMIT }}
-          imagePullPolicy: Always
-          args:
-            - --json
-          volumeMounts:
-            - mountPath: /etc/ssl/certs
-              name: ssl-certs-host
-              readOnly: true
-          env:
-            - name: SLACK_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: klint
-                  key: slack
-      volumes:
-        - hostPath:
-            path: /usr/share/ca-certificates
+      - args:
+        - --json
+        env:
+        - name: SLACK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: slack
+              name: klint
+        image: registry.usw.co/cloud/klint:{{ .Env.DRONE_COMMIT }}
+        imagePullPolicy: Always
+        name: klint
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/ssl/certs
           name: ssl-certs-host
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /usr/share/ca-certificates
+          type: ""
+        name: ssl-certs-host
+status: {}
