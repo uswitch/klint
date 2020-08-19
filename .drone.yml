@@ -6,7 +6,7 @@ pipeline:
   build:
     when:
       event: push
-    image: golang:1.12
+    image: golang:1.14
     environment:
       - GO111MODULE=on
     commands:
@@ -20,10 +20,12 @@ pipeline:
     tags: [ "${DRONE_COMMIT_SHA}", "latest" ]
 
   deploy:
-    secrets: [ KUBE_CA, KUBE_TOKEN, KUBE_SERVER ]
     when:
       event: deployment
     image: registry.usw.co/drone/deployment:latest
     kubernetes:
       template: kubernetes.yaml
       namespace: kube-system
+      clusters:
+        - red
+        - blue
