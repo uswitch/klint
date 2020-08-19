@@ -6,6 +6,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1beta1"
 	"k8s.io/api/core/v1"
 	extv1b1 "k8s.io/api/extensions/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -45,9 +46,9 @@ var (
 		},
 	}
 	WantDeployments = Want{
-		"deployments", &extv1b1.Deployment{},
+		"deployments", &appsv1.Deployment{},
 		func(cs *kubernetes.Clientset) rest.Interface {
-			return cs.ExtensionsV1beta1().RESTClient()
+			return cs.AppsV1().RESTClient()
 		},
 	}
 	WantCronJobs = Want{
