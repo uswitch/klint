@@ -9,7 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/uswitch/klint/engine"
 
-	extv1 "k8s.io/api/extensions/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
+
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -17,7 +18,7 @@ const AnnotationName = "iam.amazonaws.com/role"
 
 var ValidIAMRoleRule = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
-		deployment := new.(*extv1.Deployment)
+		deployment := new.(*appsv1.Deployment)
 		roleName := deployment.Spec.Template.GetAnnotations()[AnnotationName]
 		logger := log.WithFields(log.Fields{"rule": "ValidIAMRoleRule", "namespace": deployment.GetNamespace(), "name": deployment.GetName(), "role": roleName})
 

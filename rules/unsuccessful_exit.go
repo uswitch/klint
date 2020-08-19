@@ -2,6 +2,7 @@ package rules
 
 import (
 	"fmt"
+
 	log "github.com/Sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -36,7 +37,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 					}
 					message := fmt.Sprintf("Pod `%s.%s` (container: `%s`) has failed with exit code: `%d`", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name, c.State.Terminated.ExitCode)
 
-					result := ctx.Client().Core().Pods(pod.Namespace).GetLogs(pod.Name, opts).Do()
+					result := ctx.Client().CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, opts).Do()
 					if result.Error() != nil {
 						logger.Errorf("error retrieving pod logs: %s", result.Error())
 						ctx.Alert(newObj, message)

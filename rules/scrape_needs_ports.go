@@ -3,13 +3,13 @@ package rules
 import (
 	log "github.com/Sirupsen/logrus"
 
-	extv1b1 "k8s.io/api/extensions/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/uswitch/klint/engine"
 )
 
-func validScrapeAndPorts(d *extv1b1.Deployment) bool {
+func validScrapeAndPorts(d *appsv1.Deployment) bool {
 	_, hasScrapeAnnotation := d.Spec.Template.Annotations["prometheus.io.scrape"]
 
 	hasPorts := false
@@ -25,10 +25,10 @@ func validScrapeAndPorts(d *extv1b1.Deployment) bool {
 
 var ScrapeNeedsPortsRule = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
-		deployment := new.(*extv1b1.Deployment)
+		deployment := new.(*appsv1.Deployment)
 		logger := log.WithFields(log.Fields{"name": deployment.Name, "namespace": deployment.Namespace, "rule": "ScrapeNeedsPortsRule"})
 
-		if old == nil || validScrapeAndPorts(old.(*extv1b1.Deployment)) != validScrapeAndPorts(deployment) {
+		if old == nil || validScrapeAndPorts(old.(*appsv1.Deployment)) != validScrapeAndPorts(deployment) {
 			podName := podNameForDeployment(deployment)
 
 			if validScrapeAndPorts(deployment) { // everything is good
