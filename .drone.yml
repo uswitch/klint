@@ -18,14 +18,3 @@ pipeline:
     image: plugins/docker
     repo: registry.usw.co/cloud/klint
     tags: [ "${DRONE_COMMIT_SHA}", "latest" ]
-
-  deploy:
-    when:
-      event: deployment
-    image: registry.usw.co/drone/deployment:latest
-    kubernetes:
-      template: kubernetes.yaml
-      namespace: kube-system
-      clusters:
-        - red
-        - blue
