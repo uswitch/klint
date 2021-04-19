@@ -11,11 +11,10 @@ require (
 	github.com/alecthomas/repr v0.0.0-20181024024818-d37bc2a10ba1 // indirect
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
 	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
-	github.com/aws/aws-sdk-go v1.12.35
+	github.com/aws/aws-sdk-go v1.23.13
 	github.com/emicklei/go-restful v0.0.0-20170410110728-ff4f55a20633 // indirect
 	github.com/emicklei/go-restful-swagger12 v0.0.0-20170208215640-dcef7f557305 // indirect
 	github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680 // indirect
-	github.com/go-ini/ini v1.32.0 // indirect
 	github.com/go-openapi/jsonpointer v0.0.0-20160704185906-46af16f9f7b1 // indirect
 	github.com/go-openapi/jsonreference v0.0.0-20160704190145-13c6e3589ad9 // indirect
 	github.com/go-openapi/spec v0.0.0-20160808142527-6aced65f8501 // indirect
@@ -30,7 +29,6 @@ require (
 	github.com/hashicorp/golang-lru v0.0.0-20160207214719-a0d98a5f2880 // indirect
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c // indirect
 	github.com/imdario/mergo v0.0.0-20141206190957-6633656539c1 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20171120063526-dd801d4f4ce7 // indirect
 	github.com/json-iterator/go v0.0.0-20170829155851-36b14963da70 // indirect
 	github.com/juju/ratelimit v0.0.0-20170523012141-5b9ff8664717 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
@@ -43,15 +41,14 @@ require (
 	github.com/satori/go.uuid v1.1.0
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
-	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
+	golang.org/x/net v0.0.0-20190311183353-d8887717615a // indirect
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.5
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
 	gopkg.in/inf.v0 v0.9.0 // indirect
-	gopkg.in/ini.v1 v1.44.0 // indirect
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0 // indirect
 	k8s.io/api v0.0.0-20171016062617-6c6dac027722
 	k8s.io/apimachinery v0.0.0-20170925234155-019ae5ada31d
