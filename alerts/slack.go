@@ -1,8 +1,8 @@
 package alerts
 
 import (
-	log "github.com/Sirupsen/logrus"
 	"github.com/nlopes/slack"
+	log "github.com/sirupsen/logrus"
 )
 
 type SlackOutput struct {

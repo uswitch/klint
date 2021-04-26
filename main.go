@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 

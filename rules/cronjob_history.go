@@ -3,7 +3,7 @@ package rules
 import (
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/uswitch/klint/engine"
 
