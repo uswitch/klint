@@ -27,8 +27,15 @@ var ValidIAMRoleRule = engine.NewRule(
 			return
 		}
 
-		session := session.New()
-		svc := iam.New(session)
+		var yo bool = true
+
+		sess := session.Must(session.NewSession(&aws.Config{
+			Region:                        aws.String("eu-west-1"),
+			CredentialsChainVerboseErrors: &yo,
+		}))
+
+		// session := session.New()
+		svc := iam.New(sess)
 
 		_, err := svc.GetRole(&iam.GetRoleInput{RoleName: aws.String(roleName)})
 		if err != nil {
