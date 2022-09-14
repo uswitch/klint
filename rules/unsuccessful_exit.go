@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"context"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
@@ -18,7 +19,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 
 		for _, c := range pod.Status.ContainerStatuses {
 			logger = logger.WithFields(log.Fields{"container.name": c.Name, "container.id": c.ContainerID})
-
+			contx := context.Background()
 			if c.State.Terminated != nil {
 				switch exitCode := c.State.Terminated.ExitCode; exitCode {
 				case 0: // Everything was OK
@@ -37,7 +38,7 @@ var UnsuccessfulExitRule = engine.NewRule(
 					}
 					message := fmt.Sprintf("Pod `%s.%s` (container: `%s`) has failed with exit code: `%d`", pod.ObjectMeta.Namespace, pod.ObjectMeta.Name, c.Name, c.State.Terminated.ExitCode)
 
-					result := ctx.Client().CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, opts).Do()
+					result := ctx.Client().CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, opts).Do(contx)
 					if result.Error() != nil {
 						logger.Errorf("error retrieving pod logs: %s", result.Error())
 						ctx.Alert(newObj, message)
