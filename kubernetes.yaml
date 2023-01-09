@@ -13,9 +13,8 @@ spec:
     metadata:
       labels:
         app: klint
-      annotations:
-        iam.amazonaws.com/role: kubernetes_klint
     spec:
+      serviceAccountName: klint
       containers:
         - name: klint
           image: registry.usw.co/cloud/klint:{{ .Env.DRONE_COMMIT }}
@@ -36,3 +35,12 @@ spec:
         - hostPath:
             path: /usr/share/ca-certificates
           name: ssl-certs-host
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: klint
+  namespace: kube-system
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789:role/kubernetes_klint
+    eks.amazonaws.com/token-expiration: "86400"

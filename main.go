@@ -82,7 +82,6 @@ func main() {
 	engine.AddRule(rules.UnsuccessfulExitRule)
 	engine.AddRule(rules.ResourceAnnotationRule)
 	engine.AddRule(rules.ScrapeNeedsPortsRule)
-	engine.AddRule(rules.ValidIAMRoleRule)
 	engine.AddRule(rules.RequireCronJobHistoryLimits)
 	engine.AddRule(rules.IngressNeedsAnnotation)
 
