@@ -3,15 +3,15 @@ package engine
 import (
 	"fmt"
 
-	batchv1 "k8s.io/api/batch/v1beta1"
-	"k8s.io/api/core/v1"
-	extv1b1 "k8s.io/api/extensions/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1beta1"
+	v1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Output interface {
@@ -58,9 +58,9 @@ var (
 		},
 	}
 	WantIngress = Want{
-		"ingresses", &extv1b1.Ingress{},
+		"ingresses", &networkingv1.Ingress{},
 		func(cs *kubernetes.Clientset) rest.Interface {
-			return cs.ExtensionsV1beta1().RESTClient()
+			return cs.NetworkingV1().RESTClient()
 		},
 	}
 )
