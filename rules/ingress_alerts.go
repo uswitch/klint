@@ -5,7 +5,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/uswitch/klint/engine"
-	extv1b1 "k8s.io/api/extensions/v1beta1"
+
+	networkingv1 "k8s.io/api/networking/v1"
+
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -15,7 +17,7 @@ const (
 
 var IngressNeedsAnnotation = engine.NewRule(
 	func(old runtime.Object, new runtime.Object, ctx *engine.RuleHandlerContext) {
-		ingress := new.(*extv1b1.Ingress)
+		ingress := new.(*networkingv1.Ingress)
 		logger := log.WithFields(log.Fields{"name": ingress.Name, "namespace": ingress.Namespace, "rule": "IngressNeedsAnnotation"})
 		annotation := ingress.GetAnnotations()
 		hasAnnotation := false
