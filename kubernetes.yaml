@@ -17,7 +17,7 @@ spec:
       serviceAccountName: klint
       containers:
         - name: klint
-          image: registry.usw.co/cloud/klint:{{ .Env.DRONE_COMMIT }}
+          image: quay.io/uswitch/klint:{{ TAG }}
           imagePullPolicy: Always
           args:
             - --json
