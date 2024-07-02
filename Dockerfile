@@ -6,6 +6,6 @@ FROM scratch
 
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-ADD bin/klint /klint
+ADD --chmod=755  bin/klint /klint
 
 ENTRYPOINT ["/klint"]
