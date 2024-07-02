@@ -1,0 +1,50 @@
+name: push
+
+on: push
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        env:
+            GO111MODULE: "on"
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-go@v4
+              with:
+                go-version: "1.18"
+            - run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/klint .
+            - uses: actions/upload-artifact@v4
+              with:
+                name: bin
+                path: bin/
+
+    docker:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/download-artifact@v4
+          with:
+            name: bin
+            path: bin/
+        - name: Login to Quay.io
+          uses: docker/login-action@v3
+          with:
+            registry: quay.io
+            username: ${{ secrets.QUAY_USERNAME }}
+            password: ${{ secrets.QUAY_PASSWORD }}
+        - id: meta
+          uses: docker/metadata-action@v5
+          with:
+            images: quay.io/uswitch/klint
+            tags: type=sha,prefix=,format=long
+        - uses: docker/build-push-action@v6
+          with:
+            context: .
+            labels: ${{ steps.meta.outputs.labels }}
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}

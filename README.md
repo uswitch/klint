@@ -3,6 +3,23 @@
 A tool that listens to changes in Kubernetes resources and runs linting rules against them. Alerts are published
 via Slack webhooks to a configurable channel (using an annotation on the object or the object's namespace).
 
+## Table of contents- [klint](#klint)
+- [klint](#klint)
+  - [Table of contents- klint](#table-of-contents--klint)
+  - [Rationale](#rationale)
+  - [Building](#building)
+  - [Using](#using)
+  - [Rules](#rules)
+    - [UnsuccessfulExitRule](#unsuccessfulexitrule)
+    - [ResourceAnnotationRule](#resourceannotationrule)
+    - [ScrapeNeedsPortsRule](#scrapeneedsportsrule)
+    - [ValidIAMRoleRule](#validiamrolerule)
+    - [RequireCronJobHistoryLimits](#requirecronjobhistorylimits)
+  - [Building](#building-1)
+  - [Notes](#notes)
+  - [License](#license)
+
+
 ## Rationale
 We started Klint to help us move more production teams over to our Kubernetes infrastructure. It helps us achieve:
 
@@ -63,6 +80,10 @@ failure history limits, and that these should both be lower than 10.
 ```
 $ go build -o bin/klint .
 ```
+
+## Notes
+* *July 2024 -* The `klint` image is now stored in the `uswitch/klint` repository on Quay.
+<br>
 
 ## License
 
