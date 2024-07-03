@@ -41,7 +41,9 @@ jobs:
           uses: docker/metadata-action@v5
           with:
             images: quay.io/uswitch/klint
-            tags: type=sha,prefix=,format=long
+            tags: |
+              type=semver,pattern={{raw}}
+              type=sha,prefix=,format=long
         - uses: docker/build-push-action@v6
           with:
             context: .
