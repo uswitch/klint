@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1beta1"
+	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,7 +54,7 @@ var (
 	WantCronJobs = Want{
 		"cronjobs", &batchv1.CronJob{},
 		func(cs *kubernetes.Clientset) rest.Interface {
-			return cs.BatchV1beta1().RESTClient()
+			return cs.BatchV1().RESTClient()
 		},
 	}
 	WantIngress = Want{
