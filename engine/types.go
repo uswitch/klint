@@ -54,7 +54,7 @@ var (
 	WantCronJobs = Want{
 		"cronjobs", &batchv1.CronJob{},
 		func(cs *kubernetes.Clientset) rest.Interface {
-			return cs.BatchV1beta1().RESTClient()
+			return cs.BatchV1().RESTClient()
 		},
 	}
 	WantIngress = Want{
