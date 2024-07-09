@@ -7,7 +7,7 @@ import (
 
 	"github.com/uswitch/klint/engine"
 
-	batchv1 "k8s.io/api/batch/v1beta1"
+	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
